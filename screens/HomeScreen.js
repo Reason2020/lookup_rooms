@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Pressable, Image, ScrollView, Dimensions, StatusBar, FlatList } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Pressable, Image, ScrollView, Dimensions, StatusBar, FlatList, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { fetchRoomsByLocation } from '../api/apiCall';
 import { colors } from '../constants';
@@ -8,11 +8,13 @@ import RoomCard from '../components/RoomCard';
 
 const { height, width } = Dimensions.get('screen');
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
     const [ rooms, setRooms ] = useState([]);
+    const [ isLoading, setIsLoading ] = useState(true);
     
     useEffect(() => {
         getRoomDetails();
+        setIsLoading(!isLoading);
     }, []);
 
     //get data from the api call
@@ -24,7 +26,8 @@ const HomeScreen = ({ navigation }) => {
 
     console.log('Height: ' + height);
   return (
-    <SafeAreaView style={{flex: 1}}>
+    isLoading ? (<ActivityIndicator size='large' animating={true}/>) : (
+        <SafeAreaView style={{flex: 1}}>
         <StatusBar />
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{alignItems: 'center'}}>
             {/* header */}
@@ -41,7 +44,7 @@ const HomeScreen = ({ navigation }) => {
 
             <View style={styles.introContainer}>
                 {/* we can change name based on login later */}
-                <Text style={styles.textStyle}>Hi there, Reason!</Text>
+                <Text style={styles.textStyle}>Hi there, {route.params.username}!</Text>
                 <MaterialCommunityIcons name="hand-wave" size={24} color={colors.yellow} />
             </View>
 
@@ -49,16 +52,14 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.textStyle}>Available Rooms in Paris!</Text>
 
             {/* Room Cards Listed */}
-            <FlatList 
-                data={rooms}
-                renderItem={({item}) => (<Pressable onPress={() => navigation.navigate('RoomDetail')}>
-                    <RoomCard roomDetails={item} screenHeight={height} screenWidth={width}/>
-                </Pressable>)}
-                keyExtractor={(item) => item.id}
-                
-            />
+            {rooms.map((room) => (
+                <Pressable onPress={() => navigation.navigate('RoomDetail')} key={room.id}>
+                    <RoomCard roomDetails={room} screenHeight={height} screenWidth={width} />
+                </Pressable>
+            ))}
         </ScrollView>
     </SafeAreaView>
+    )
   )
 }
 
