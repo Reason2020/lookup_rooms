@@ -19,10 +19,11 @@ const HomeScreen = ({ navigation, route }) => {
 
     //get data from the api call
     const getRoomDetails = async () => {
+        setIsLoading(true);
         const data = await fetchRoomsByLocation(city);
         // console.log(data.results);
         if (data && data.results) setRooms(data.results);
-        setIsLoading(!isLoading);
+        setIsLoading(false);
     }
 
   return (
@@ -37,19 +38,22 @@ const HomeScreen = ({ navigation, route }) => {
                     style={styles.logoStyle}
                 />
                 {/* Add search later */}
-                <Pressable onPress={() => alert('Add Search Functionality')}>
+                <Pressable onPress={() => navigation.navigate('Search', {
+                    itemId: 20,
+                    setCity: setCity
+                })}>
                     <FontAwesome name="search" size={24} color="black" />
                 </Pressable>
             </View>
 
             <View style={styles.introContainer}>
                 {/* we can change name based on login later */}
-                <Text style={styles.textStyle}>Hi there, {route.params.username}!</Text>
+                <Text style={styles.textStyle}>Hi there!</Text>
                 <MaterialCommunityIcons name="hand-wave" size={24} color={colors.yellow} />
             </View>
 
             {/* may change the location */}
-            <Text style={styles.textStyle}>Available Rooms in Paris!</Text>
+            <Text style={styles.textStyle}>Available Rooms in {city}!</Text>
 
             {/* Room Cards Listed */}
             {rooms.map((room) => (
