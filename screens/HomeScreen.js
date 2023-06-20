@@ -11,20 +11,20 @@ const { height, width } = Dimensions.get('screen');
 const HomeScreen = ({ navigation, route }) => {
     const [ rooms, setRooms ] = useState([]);
     const [ isLoading, setIsLoading ] = useState(true);
+    const [ city, setCity ] = useState('Paris')
     
     useEffect(() => {
         getRoomDetails();
-        setIsLoading(!isLoading);
-    }, []);
+    }, [city]);
 
     //get data from the api call
     const getRoomDetails = async () => {
-        const data = await fetchRoomsByLocation('Paris');
+        const data = await fetchRoomsByLocation(city);
         // console.log(data.results);
         if (data && data.results) setRooms(data.results);
+        setIsLoading(!isLoading);
     }
 
-    console.log('Height: ' + height);
   return (
     isLoading ? (<ActivityIndicator size='large' animating={true}/>) : (
         <SafeAreaView style={{flex: 1}}>
@@ -53,7 +53,10 @@ const HomeScreen = ({ navigation, route }) => {
 
             {/* Room Cards Listed */}
             {rooms.map((room) => (
-                <Pressable onPress={() => navigation.navigate('RoomDetail')} key={room.id}>
+                <Pressable onPress={() => navigation.navigate('RoomDetail', {
+                    itemId: room.id,
+                    roomDetails: room
+                })} key={room.id}>
                     <RoomCard roomDetails={room} screenHeight={height} screenWidth={width} />
                 </Pressable>
             ))}
